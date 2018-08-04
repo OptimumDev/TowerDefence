@@ -33,7 +33,7 @@ class Game:
 
         self.enemies = []
         self.enemies_to_add = 3
-        self.__enemies_add_interval = 15
+        self.__enemies_add_interval = 35
         self.__enemies_add_ticks = 0
         self.__enemies_health = 30
         self.__enemies_damage = 5

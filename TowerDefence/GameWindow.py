@@ -16,7 +16,7 @@ class GameWindow(QMainWindow):
         self.__height = 800
         self.__font = QFont("times", 20)
 
-        self.__image_size = 50
+        self.__image_size = 64
         self.__timer_interval = 33
         self.__timer = QBasicTimer()
 
@@ -32,11 +32,11 @@ class GameWindow(QMainWindow):
         self.setWindowIcon(QIcon('images/smorc.png'))
 
         self.__pause_btn = QPushButton('Pause/Play', self)
-        self.__pause_btn.move(50, 410)
+        self.__pause_btn.move(50, 610)
         self.__pause_btn.clicked.connect(self.pause_click)
 
         self.__tower_btn = QPushButton(f'Build Tower ({self.game.tower_cost}G)', self)
-        self.__tower_btn.move(150, 410)
+        self.__tower_btn.move(150, 610)
         self.__tower_btn.clicked.connect(self.show_tower_cell_btns)
 
         self.__restart_btn = QPushButton('Restart', self)
@@ -64,7 +64,7 @@ class GameWindow(QMainWindow):
         self.__tower_cell_btns_shown = False
 
         self.__add_enemy_btn = QPushButton('Add Enemy', self)
-        self.__add_enemy_btn.move(250, 410)
+        self.__add_enemy_btn.move(250, 610)
         self.__add_enemy_btn.clicked.connect(self.add_enemy_to_queue)
 
         self.__timer.start(self.__timer_interval, self)
@@ -75,7 +75,7 @@ class GameWindow(QMainWindow):
     def for_the_horde(self):
         for i in range(100500):
             self.add_enemy_to_queue()
-        self.__timer_interval = 10
+        self.__timer_interval = 3
         self.unpause()
         self.game.towers = []
 
