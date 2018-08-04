@@ -39,7 +39,7 @@ class Game:
         self.__enemies_damage = 5
         self.__enemy_gold = 10
 
-        self.__units_turn_ticks_interval = 10
+        self.__units_turn_ticks_interval = 20
 
     def get_map_size(self, map_file):
         with open(map_file) as game_map:
