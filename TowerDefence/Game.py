@@ -108,14 +108,17 @@ class Game:
                 if self.is_units_turn:
                     enemy.move()
 
-        if self.is_units_turn:
-            for arrow in self.arrows:
+        for arrow in self.arrows:
+            if arrow.got_to_enemy:
+                self.arrows.remove(arrow)
+            else:
                 arrow.move()
 
+        if self.is_units_turn:
             for tower in self.towers:
                 for enemy in self.enemies:
                     if tower.try_to_shoot(enemy):
-                        self.arrows.append(Arrow(tower.coordinates, enemy))
+                        self.arrows.append(Arrow(tower.coordinates, enemy, self.tower_damage))
                         break
 
         if self.enemies_to_add > 0:

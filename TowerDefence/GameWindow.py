@@ -17,7 +17,7 @@ class GameWindow(QMainWindow):
         self.__font = QFont("times", 20)
 
         self.__image_size = 50
-        self.__timer_interval = 100
+        self.__timer_interval = 33
         self.__timer = QBasicTimer()
 
         self.__is_paused = False

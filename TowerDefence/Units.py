@@ -87,7 +87,6 @@ class Tower(Unit):
 
     def try_to_shoot(self, target):
         if type(target) is Enemy and self.is_able_to_shoot(target.coordinates):
-            target.get_damage(self.damage)
             return True
         return False
 
@@ -110,17 +109,26 @@ class Castle(Unit):
 
 
 class Arrow(Unit):
-    def __init__(self, coordinates, enemy):
+    def __init__(self, coordinates, enemy, damage):
         super().__init__(coordinates, QPixmap('images/arrow.png'))
+        self.initial_image = self.image
         self.enemy = enemy
+        self.damage = damage
         self.rotate()
+
+    @property
+    def got_to_enemy(self):
+        return self.coordinates == self.enemy.coordinates
 
     def rotate(self):
         angle = math.atan2(self.coordinates.y - self.enemy.coordinates.y,
                            self.coordinates.x - self.enemy.coordinates.x)
         transform = QTransform().rotate(-90 + angle * 180 / math.pi)
-        self._image = self.image.transformed(transform)
+        self._image = self.initial_image.transformed(transform)
 
     def move(self):
+        self.rotate()
         dif = self.enemy.coordinates - self.coordinates
         self._coordinates = self.coordinates + dif.normalize()
+        if self.got_to_enemy:
+            self.enemy.get_damage(self.damage)
