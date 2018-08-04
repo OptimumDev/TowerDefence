@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from Units import Land, Castle
+from Units import Land, Castle, Enemy
 from Point import Point
 from GameWindow import GameWindow
 
@@ -11,26 +11,33 @@ class Game:
         self.__start = Point(0, 0)
         self.__finish = Point(0, 0)
 
+        self.__tick_number = 0
+
         self.__castle_coordinates = []
         map_size = self.get_map_size(map_file)
-        self.__game_map = self.get_map(map_file)
+        self.game_map = self.get_map(map_file)
         self.__castle_health = 100
-        self.__castle = self.get_castle()
+        self.castle = self.get_castle()
         self.__map_width = map_size[0]
         self.__map_height = map_size[1]
         self.__enemies_route = self.get_enemies_route()
 
-    @property
-    def game_map(self):
-        return self.__game_map
+        self.towers = []
+        self.__tower_damage = 5
+        self.__tower_shooting_range = 5
+        self.tower_cost = 30
 
-    @property
-    def enemies_route(self):
-        return self.__enemies_route
+        self.gold = 60
 
-    @property
-    def castle(self):
-        return self.__castle
+        self.enemies = []
+        self.enemies_to_add = 3
+        self.__enemies_add_interval = 15
+        self.__enemies_add_ticks = 0
+        self.__enemies_health = 30
+        self.__enemies_damage = 5
+        self.__enemy_gold = 10
+
+        self.__units_turn_ticks_interval = 10
 
     def get_map_size(self, map_file):
         with open(map_file) as game_map:
@@ -60,7 +67,7 @@ class Game:
         return result
 
     def get_enemies_route(self):
-        road = [land.coordinates for land in self.__game_map if land.is_road]
+        road = [land.coordinates for land in self.game_map if land.is_road]
         route = [self.__start]
         visited = [self.__start]
         while route[-1] != self.__finish:
@@ -76,6 +83,42 @@ class Game:
         self.__castle_coordinates.sort()
         coordinates = self.__castle_coordinates[1]
         return Castle(coordinates, self.__castle_health)
+
+    @property
+    def is_units_turn(self):
+        return self.__tick_number % self.__units_turn_ticks_interval == 0
+
+    def add_enemy(self):
+        self.enemies.append(Enemy(self.__enemies_health, self.__enemies_route, self.__enemies_damage))
+        self.enemies_to_add -= 1
+
+    def update(self):
+        self.__tick_number += 1
+
+        for enemy in self.enemies:
+            if not enemy.is_alive:
+                self.enemies.remove(enemy)
+                self.gold += self.__enemy_gold
+            if enemy.got_to_route_end:
+                self.castle.get_damage(enemy.damage)
+                self.enemies.remove(enemy)
+            else:
+                if self.is_units_turn:
+                    enemy.move()
+
+        if self.is_units_turn:
+            for tower in self.towers:
+                for enemy in self.enemies:
+                    if tower.try_to_shoot(enemy):
+                        # arrow
+                        break
+
+        if self.enemies_to_add > 0:
+            if self.__enemies_add_ticks == 0:
+                self.add_enemy()
+                self.__enemies_add_ticks = self.__enemies_add_interval
+            else:
+                self.__enemies_add_ticks -= 1
 
 
 if __name__ == '__main__':

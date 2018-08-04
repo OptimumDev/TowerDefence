@@ -106,3 +106,7 @@ class Castle(Unit):
     @property
     def is_alive(self):
         return self.__health > 0
+
+class Arrow(Unit):
+    def __init__(self, coordinates, enemy):
+        super.__init__(coordinates, QPixmap('images/arrow.png'))
