@@ -50,6 +50,15 @@ class Point:
                 Point(self.x, self.y - 1),
                 Point(self.x, self.y + 1))
 
+    def normalize(self):
+        x = 0
+        y = 0
+        if self.__x != 0:
+            x = self.__x // abs(self.__x)
+        if self.__y != 0:
+            y = self.__y // abs(self.__y)
+        return Point(x, y)
+
     @property
     def x(self):
         return self.__x

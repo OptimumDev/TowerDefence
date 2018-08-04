@@ -1,4 +1,5 @@
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QTransform
+import math
 
 
 class Unit:
@@ -107,6 +108,19 @@ class Castle(Unit):
     def is_alive(self):
         return self.__health > 0
 
+
 class Arrow(Unit):
     def __init__(self, coordinates, enemy):
-        super.__init__(coordinates, QPixmap('images/arrow.png'))
+        super().__init__(coordinates, QPixmap('images/arrow.png'))
+        self.enemy = enemy
+        self.rotate()
+
+    def rotate(self):
+        angle = math.atan2(self.coordinates.y - self.enemy.coordinates.y,
+                           self.coordinates.x - self.enemy.coordinates.x)
+        transform = QTransform().rotate(-90 + angle * 180 / math.pi)
+        self._image = self.image.transformed(transform)
+
+    def move(self):
+        dif = self.enemy.coordinates - self.coordinates
+        self._coordinates = self.coordinates + dif.normalize()

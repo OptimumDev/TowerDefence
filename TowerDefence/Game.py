@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from Units import Land, Castle, Enemy
+from Units import Land, Castle, Enemy, Arrow
 from Point import Point
 from GameWindow import GameWindow
 
@@ -22,9 +22,11 @@ class Game:
         self.__map_height = map_size[1]
         self.__enemies_route = self.get_enemies_route()
 
+        self.arrows = []
+
         self.towers = []
-        self.__tower_damage = 5
-        self.__tower_shooting_range = 5
+        self.tower_damage = 5
+        self.tower_shooting_range = 5
         self.tower_cost = 30
 
         self.gold = 60
@@ -107,10 +109,13 @@ class Game:
                     enemy.move()
 
         if self.is_units_turn:
+            for arrow in self.arrows:
+                arrow.move()
+
             for tower in self.towers:
                 for enemy in self.enemies:
                     if tower.try_to_shoot(enemy):
-                        # arrow
+                        self.arrows.append(Arrow(tower.coordinates, enemy))
                         break
 
         if self.enemies_to_add > 0:

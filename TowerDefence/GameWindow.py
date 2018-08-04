@@ -99,7 +99,7 @@ class GameWindow(QMainWindow):
 
     def build_tower(self, button):
         coordinates = Point(button.x(), button.y()).convert_to_cell_coordinates(self.__image_size, 1)
-        self.game.towers.append(Tower(coordinates, self.__tower_damage, self.__tower_shooting_range))
+        self.game.towers.append(Tower(coordinates, self.game.tower_damage, self.game.tower_shooting_range))
         self.show_tower_cell_btns()
         self.__tower_cell_btns.remove(button)
         self.game.gold -= self.game.tower_cost
@@ -181,6 +181,9 @@ class GameWindow(QMainWindow):
         self.draw_enemies(painter)
         self.draw_towers(painter)
         self.draw_castle(painter)
+
+        for arrow in self.game.arrows:
+            self.draw_in_cell(arrow.image, arrow.coordinates, painter)
 
         painter.end()
 
