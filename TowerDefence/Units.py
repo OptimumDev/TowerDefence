@@ -18,7 +18,6 @@ class Unit:
 
 
 class Land(Unit):
-
     def __init__(self, is_road, coordinates):
         self.__is_road = is_road
         image = QPixmap('images/road.png') if is_road else QPixmap('images/grass.png')

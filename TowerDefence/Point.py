@@ -36,10 +36,10 @@ class Point:
         return self.x < other.x
 
     def convert_to_image_coordinates(self, image_size, shift):
-        return Point((self.x + shift) * image_size, (self.y + shift) * image_size)
+        return Point((self.x) * image_size, (self.y + shift) * image_size)
 
     def convert_to_cell_coordinates(self, image_size, shift):
-        return Point(self.x // image_size - shift, self.y // image_size - shift)
+        return Point(self.x // image_size, self.y // image_size - shift)
 
     def get_distance(self, other):
         return sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)

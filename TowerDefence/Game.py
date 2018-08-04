@@ -13,7 +13,6 @@ class Game:
 
         self.__tick_number = 0
 
-        self.__castle_coordinates = []
         map_size = self.get_map_size(map_file)
         self.game_map = self.get_map(map_file)
         self.__castle_health = 100
@@ -59,8 +58,6 @@ class Game:
                         self.__start = Point(x, y)
                     if letter == 'f':
                         self.__finish = Point(x, y)
-                    if letter == 'c':
-                        self.__castle_coordinates.append(Point(x, y))
                     if letter not in 'sfg#':
                         continue
                     result.append(Land(letter in '#sf', Point(x, y)))
@@ -82,8 +79,7 @@ class Game:
         return route
 
     def get_castle(self):
-        self.__castle_coordinates.sort()
-        coordinates = self.__castle_coordinates[1]
+        coordinates = self.__finish + Point(1, -2)
         return Castle(coordinates, self.__castle_health)
 
     @property

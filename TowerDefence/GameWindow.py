@@ -12,8 +12,8 @@ class GameWindow(QMainWindow):
 
     def __init__(self, game):
         super().__init__()
-        self.__width = 1600
-        self.__height = 800
+        self.__width = 1920
+        self.__height = 1000
         self.__font = QFont("times", 20)
 
         self.__image_size = 64
@@ -27,7 +27,7 @@ class GameWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setGeometry(100, 100, self.__width, self.__height)
+        self.setGeometry(0, 30, self.__width, self.__height)
         self.setWindowTitle('TD')
         self.setWindowIcon(QIcon('images/smorc.png'))
 
@@ -55,7 +55,7 @@ class GameWindow(QMainWindow):
         for cell in self.game.game_map:
             if not cell.is_road:
                 button = QPushButton('', self)
-                button.setGeometry((1 + cell.coordinates.x) * self.__image_size,
+                button.setGeometry((cell.coordinates.x) * self.__image_size,
                                    (1 + cell.coordinates.y) * self.__image_size,
                                    self.__image_size, self.__image_size)
                 button.clicked.connect(partial(self.build_tower, button))
@@ -144,7 +144,7 @@ class GameWindow(QMainWindow):
         painter.setFont(self.__font)
         painter.drawText(50, 35, f'Enemies left: {self.game.enemies_to_add}')
         for enemy in self.game.enemies:
-            self.draw_in_cell(enemy.image, enemy.coordinates, painter)
+            self.draw_in_cell(enemy.image, enemy.coordinates, painter, 0, self.__image_size // 4)
 
     def draw_towers(self, painter):
         for tower in self.game.towers:
@@ -156,12 +156,12 @@ class GameWindow(QMainWindow):
         image = self.game.castle.image
         coordinates = self.game.castle.coordinates
         coordinates = coordinates.convert_to_image_coordinates(self.__image_size, 1)
-        painter.drawPixmap(coordinates.x, coordinates.y, self.__image_size * 2, self.__image_size * 2, image)
+        painter.drawPixmap(coordinates.x, coordinates.y, self.__image_size * 3, self.__image_size * 3, image)
 
-    def draw_in_cell(self, image, cell_coordinates, painter):
+    def draw_in_cell(self, image, cell_coordinates, painter, x_shift=0, y_shift=0):
         image_coordinates = cell_coordinates.convert_to_image_coordinates(self.__image_size, 1)
-        x = image_coordinates.x
-        y = image_coordinates.y
+        x = image_coordinates.x + x_shift
+        y = image_coordinates.y - y_shift
         painter.drawPixmap(x, y, self.__image_size, self.__image_size, image)
 
     def draw_signature(self, painter):
@@ -178,8 +178,8 @@ class GameWindow(QMainWindow):
         self.draw_gold(painter)
 
         self.draw_map(painter)
-        self.draw_enemies(painter)
         self.draw_towers(painter)
+        self.draw_enemies(painter)
         self.draw_castle(painter)
 
         for arrow in self.game.arrows:
