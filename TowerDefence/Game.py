@@ -1,11 +1,21 @@
-import sys
-from PyQt5.QtWidgets import QApplication
-from Units import Land, Castle, Enemy, Arrow
+from Units import Land, Castle, Enemy, Arrow, Tower
 from Point import Point
-from GameWindow import GameWindow
 
 
 class Game:
+
+    CASTLE_HEALTH = 100
+
+    TOWER_DAMAGE = 5
+    TOWER_RANGE = 5
+    TOWER_COST = 30
+
+    ENEMY_ADD_INTERVAL = 35
+    ENEMY_HEALTH = 30
+    ENEMY_DAMAGE = 5
+    ENEMY_GOLD = 10
+
+    UNITS_TURN_INTERVAL = 20
 
     def __init__(self, map_file):
         self.__start = Point(0, 0)
@@ -15,7 +25,6 @@ class Game:
 
         map_size = self.get_map_size(map_file)
         self.game_map = self.get_map(map_file)
-        self.__castle_health = 100
         self.castle = self.get_castle()
         self.__map_width = map_size[0]
         self.__map_height = map_size[1]
@@ -24,21 +33,11 @@ class Game:
         self.arrows = []
 
         self.towers = []
-        self.tower_damage = 5
-        self.tower_shooting_range = 5
-        self.tower_cost = 30
-
         self.gold = 60
 
         self.enemies = []
         self.enemies_to_add = 3
-        self.__enemies_add_interval = 35
         self.__enemies_add_ticks = 0
-        self.__enemies_health = 30
-        self.__enemies_damage = 5
-        self.__enemy_gold = 10
-
-        self.__units_turn_ticks_interval = 20
 
     def get_map_size(self, map_file):
         with open(map_file) as game_map:
@@ -80,56 +79,67 @@ class Game:
 
     def get_castle(self):
         coordinates = self.__finish + Point(1, -2)
-        return Castle(coordinates, self.__castle_health)
+        return Castle(coordinates, self.CASTLE_HEALTH)
 
     @property
     def is_units_turn(self):
-        return self.__tick_number % self.__units_turn_ticks_interval == 0
+        return self.__tick_number % self.UNITS_TURN_INTERVAL == 0
 
     def add_enemy(self):
-        self.enemies.append(Enemy(self.__enemies_health, self.__enemies_route, self.__enemies_damage))
+        self.enemies.append(Enemy(self.ENEMY_HEALTH, self.__enemies_route, self.ENEMY_DAMAGE))
         self.enemies_to_add -= 1
 
-    def update(self):
-        self.__tick_number += 1
+    @property
+    def able_to_build_tower(self):
+        return self.gold >= self.TOWER_COST
 
+    def build_tower(self, coordinates):
+        self.towers.append(Tower(coordinates, self.TOWER_DAMAGE, self.TOWER_RANGE))
+        self.gold -= self.TOWER_COST
+
+    def check_enemies(self):
         for enemy in self.enemies:
             if not enemy.is_alive:
                 self.enemies.remove(enemy)
-                self.gold += self.__enemy_gold
-            if enemy.got_to_route_end:
+                self.gold += self.ENEMY_GOLD
+            elif enemy.got_to_route_end:
                 self.castle.get_damage(enemy.damage)
                 self.enemies.remove(enemy)
-            else:
-                if self.is_units_turn:
-                    enemy.move()
 
+    def arrows_turn(self):
         for arrow in self.arrows:
             if arrow.got_to_enemy:
                 self.arrows.remove(arrow)
             else:
                 arrow.move()
 
-        if self.is_units_turn:
-            for tower in self.towers:
-                for enemy in self.enemies:
-                    if tower.try_to_shoot(enemy):
-                        self.arrows.append(Arrow(tower.coordinates, enemy, self.tower_damage))
-                        break
+    def enemies_turn(self):
+        for enemy in self.enemies:
+            enemy.move()
 
+    def towers_turn(self):
+        for tower in self.towers:
+            for enemy in self.enemies:
+                if tower.try_to_shoot(enemy):
+                    self.arrows.append(Arrow(tower.coordinates, enemy, self.TOWER_DAMAGE))
+                    break
+
+    def units_turn(self):
+        if self.is_units_turn:
+            self.enemies_turn()
+            self.towers_turn()
+
+    def add_enemies(self):
         if self.enemies_to_add > 0:
             if self.__enemies_add_ticks == 0:
                 self.add_enemy()
-                self.__enemies_add_ticks = self.__enemies_add_interval
+                self.__enemies_add_ticks = self.ENEMY_ADD_INTERVAL
             else:
                 self.__enemies_add_ticks -= 1
 
-
-if __name__ == '__main__':
-    currentExitCode = GameWindow.EXIT_CODE_REBOOT
-    while currentExitCode == GameWindow.EXIT_CODE_REBOOT:
-        app = QApplication(sys.argv)
-        window = GameWindow(Game('map.txt'))
-        currentExitCode = app.exec_()
-        app = None
-    sys.exit(currentExitCode)
+    def update(self):
+        self.__tick_number += 1
+        self.check_enemies()
+        self.arrows_turn()
+        self.units_turn()
+        self.add_enemies()
