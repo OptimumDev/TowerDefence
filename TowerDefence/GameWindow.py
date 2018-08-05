@@ -31,23 +31,23 @@ class GameWindow(QMainWindow):
         self.setWindowTitle('TD')
         self.setWindowIcon(QIcon('images/smorc.png'))
 
-        self.__pause_btn = QPushButton('Pause/Play', self)
-        self.__pause_btn.move(50, 610)
-        self.__pause_btn.clicked.connect(self.pause_click)
+        self.__pause_button = QPushButton('Pause/Play', self)
+        self.__pause_button.move(50, 610)
+        self.__pause_button.clicked.connect(self.pause_click)
 
-        self.__tower_btn = QPushButton(f'Build Tower ({Game.TOWER_COST}G)', self)
-        self.__tower_btn.move(150, 610)
-        self.__tower_btn.clicked.connect(self.show_tower_cell_btns)
+        self.__tower_button = QPushButton(f'Build Tower ({Game.TOWER_COST}G)', self)
+        self.__tower_button.move(150, 610)
+        self.__tower_button.clicked.connect(self.show_tower_cell_btns)
 
-        self.__restart_btn = QPushButton('Restart', self)
-        self.__restart_btn.move(self.WIDTH - 250, 10)
-        self.__restart_btn.clicked.connect(self.restart)
+        self.__restart_button = QPushButton('Restart', self)
+        self.__restart_button.move(self.WIDTH - 250, 10)
+        self.__restart_button.clicked.connect(self.restart)
 
-        self.__quit_btn = QPushButton('Quit', self)
-        self.__quit_btn.move(self.WIDTH - 150, 10)
-        self.__quit_btn.clicked.connect(self.quit)
+        self.__quit_button = QPushButton('Quit', self)
+        self.__quit_button.move(self.WIDTH - 150, 10)
+        self.__quit_button.clicked.connect(self.quit)
 
-        self.__tower_cell_btns = []
+        self.__tower_cell_buttons = []
         for cell in self.game.game_map:
             if not cell.is_road:
                 button = QPushButton('', self)
@@ -57,12 +57,12 @@ class GameWindow(QMainWindow):
                 button.setStyleSheet("border-image: url(images/towerButton.png) stretch;");
                 button.clicked.connect(partial(self.build_tower, button))
                 button.hide()
-                self.__tower_cell_btns.append(button)
-        self.__tower_cell_btns_shown = False
+                self.__tower_cell_buttons.append(button)
+        self.__tower_cell_buttons_shown = False
 
-        self.__add_enemy_btn = QPushButton('Add Enemy', self)
-        self.__add_enemy_btn.move(250, 610)
-        self.__add_enemy_btn.clicked.connect(self.add_enemy_to_queue)
+        self.__add_enemy_button = QPushButton('Add Enemy', self)
+        self.__add_enemy_button.move(250, 610)
+        self.__add_enemy_button.clicked.connect(self.add_enemy_to_queue)
 
         self.__timer.start(self.TIMER_INTERVAL, self)
 
@@ -91,20 +91,32 @@ class GameWindow(QMainWindow):
         coordinates = Point(button.x(), button.y()).convert_to_cell_coordinates(self.IMAGE_SIZE, 1)
         self.game.build_tower(coordinates)
         self.show_tower_cell_btns()
-        self.__tower_cell_btns.remove(button)
+        self.__tower_cell_buttons.remove(button)
         self.update()
 
+    def create_tower_cursor(self):
+        painter = QPainter()
+        tower = QPixmap('images/tower.png')
+        size = 2 * (Game.TOWER_RANGE - 1) * self.IMAGE_SIZE
+        circle = QPixmap(size, size)
+        circle.fill(Qt.transparent)
+        painter.begin(circle)
+        painter.drawEllipse(0, 0, circle.width() - 1, circle.height() - 1)
+        painter.drawPixmap((circle.width() - tower.width()) / 2, (circle.height() - tower.height()) / 2, tower)
+        painter.end()
+        self.setCursor(QCursor(circle))
+
     def show_tower_cell_btns(self):
-        if self.__tower_cell_btns_shown:
+        if self.__tower_cell_buttons_shown:
             self.setCursor(Qt.ArrowCursor)
         elif self.game.able_to_build_tower:
-            self.setCursor(QCursor(QPixmap('images/tower.png')))
-        for button in self.__tower_cell_btns:
-            if self.__tower_cell_btns_shown:
+            self.create_tower_cursor()
+        for button in self.__tower_cell_buttons:
+            if self.__tower_cell_buttons_shown:
                 button.hide()
             elif self.game.able_to_build_tower:
                 button.show()
-        self.__tower_cell_btns_shown = not self.__tower_cell_btns_shown
+        self.__tower_cell_buttons_shown = not self.__tower_cell_buttons_shown
 
     def restart(self):
         qApp.exit(GameWindow.EXIT_CODE_REBOOT)
