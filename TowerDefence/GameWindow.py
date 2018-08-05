@@ -1,7 +1,8 @@
 from functools import partial
 from PyQt5.QtWidgets import QMainWindow, QFrame, QPushButton, QMessageBox, qApp
-from PyQt5.QtCore import QBasicTimer
-from PyQt5.QtGui import QIcon, QPainter, QFont
+from PyQt5.QtCore import QBasicTimer, QSize
+from PyQt5.QtGui import QIcon, QPainter, QFont, QCursor, QPixmap
+from PyQt5.Qt import Qt
 from Point import Point
 from Game import Game
 
@@ -53,6 +54,8 @@ class GameWindow(QMainWindow):
                 button.setGeometry((cell.coordinates.x) * self.IMAGE_SIZE,
                                    (1 + cell.coordinates.y) * self.IMAGE_SIZE,
                                    self.IMAGE_SIZE, self.IMAGE_SIZE)
+                button.setStyleSheet("border-image: url(images/towerButton.png) stretch;");
+                button.setIconSize(QSize(self.IMAGE_SIZE, self.IMAGE_SIZE))
                 button.clicked.connect(partial(self.build_tower, button))
                 button.hide()
                 self.__tower_cell_btns.append(button)
@@ -93,6 +96,10 @@ class GameWindow(QMainWindow):
         self.update()
 
     def show_tower_cell_btns(self):
+        if self.__tower_cell_btns_shown:
+            self.setCursor(Qt.ArrowCursor)
+        elif self.game.able_to_build_tower:
+            self.setCursor(QCursor(QPixmap('images/tower.png')))
         for button in self.__tower_cell_btns:
             if self.__tower_cell_btns_shown:
                 button.hide()
