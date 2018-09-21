@@ -10,12 +10,13 @@ class Game:
     TOWER_RANGE = 5
     TOWER_COST = 30
 
-    ENEMY_ADD_INTERVAL = 35
+    ENEMY_ADD_INTERVAL = 85
     ENEMY_HEALTH = 30
     ENEMY_DAMAGE = 5
     ENEMY_GOLD = 10
 
-    UNITS_TURN_INTERVAL = 20
+    TOWER_TURN_INTERVAL = 40
+    ENEMY_TURN_INTERVAL = 2
 
     def __init__(self, map_file):
         self.__start = Point(0, 0)
@@ -82,11 +83,15 @@ class Game:
         return Castle(coordinates, self.CASTLE_HEALTH)
 
     @property
-    def is_units_turn(self):
-        return self.__tick_number % self.UNITS_TURN_INTERVAL == 0
+    def is_towers_turn(self):
+        return self.__tick_number % self.TOWER_TURN_INTERVAL == 0
+
+    @property
+    def is_enemys_turn(self):
+        return self.__tick_number % self.ENEMY_TURN_INTERVAL == 0
 
     def add_enemy(self):
-        self.enemies.append(Enemy(self.ENEMY_HEALTH, self.__enemies_route, self.ENEMY_DAMAGE, self.UNITS_TURN_INTERVAL))
+        self.enemies.append(Enemy(self.ENEMY_HEALTH, self.__enemies_route, self.ENEMY_DAMAGE, self.TOWER_TURN_INTERVAL))
         self.enemies_to_add -= 1
 
     @property
@@ -125,8 +130,9 @@ class Game:
                     break
 
     def units_turn(self):
-        self.enemies_turn()
-        if self.is_units_turn:
+        if self.is_enemys_turn:
+            self.enemies_turn()
+        if self.is_towers_turn:
             self.towers_turn()
 
     def add_enemies(self):

@@ -9,6 +9,9 @@ class Point:
         self.__x = x
         self.__y = y
 
+    def __round__(self, n=None):
+        return Point(round(self.x, n), round(self.y, n))
+
     def __abs__(self):
         return Point(abs(self.x), abs(self.y))
 
@@ -58,9 +61,9 @@ class Point:
     def normalize(self):
         x = 0
         y = 0
-        if self.__x != 0:
+        if abs(self.__x) > self.EPSILON:
             x = self.__x // abs(self.__x)
-        if self.__y != 0:
+        if abs(self.__y) > self.EPSILON:
             y = self.__y // abs(self.__y)
         return Point(x, y)
 

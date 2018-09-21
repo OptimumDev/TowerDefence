@@ -12,7 +12,7 @@ class GameWindow(QMainWindow):
     EXIT_CODE_REBOOT = -123
 
     IMAGE_SIZE = 64
-    TIMER_INTERVAL = 33
+    TIMER_INTERVAL = 16
 
     WIDTH = 1920
     HEIGHT = 1000

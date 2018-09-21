@@ -58,16 +58,12 @@ class Enemy(Unit):
     def get_damage(self, damage):
         self.__health -= damage
 
-    EPSILON = Point(0.0001, 0.0001)
-
     def move(self):
         if not self.got_to_route_end:
             direction = self.__route[self.__current_route_point + 1] - self.__route[self.__current_route_point]
             step = direction / self.steps_for_cell
             self._coordinates = self.coordinates + step
-            print(self.__route[self.__current_route_point + 1], "-", self.__route[self.__current_route_point], "=", direction, self.__current_route_point)
-            if abs(self.coordinates - self.__route[self.__current_route_point + 1]) < self.EPSILON:
-                print(abs(self.coordinates - self.__route[self.__current_route_point + 1]), 'next')
+            if self.coordinates == self.__route[self.__current_route_point + 1]:
                 self.__current_route_point += 1
 
 
@@ -116,19 +112,25 @@ class Arrow(Unit):
         self.damage = damage
         self.rotate()
 
+    ENEMY_RADIUS = Point(0, 0)
+
+    @property
+    def enemy_coordinates(self):
+        return self.enemy.coordinates + self.ENEMY_RADIUS
+
     @property
     def got_to_enemy(self):
-        return self.coordinates == self.enemy.coordinates
+        return self.coordinates == self.enemy_coordinates
 
     def rotate(self):
-        angle = math.atan2(self.coordinates.y - self.enemy.coordinates.y,
-                           self.coordinates.x - self.enemy.coordinates.x)
+        angle = math.atan2(self.coordinates.y - self.enemy_coordinates.y,
+                           self.coordinates.x - self.enemy_coordinates.x)
         transform = QTransform().rotate(-90 + angle * 180 / math.pi)
         self._image = self.initial_image.transformed(transform)
 
     def move(self):
         self.rotate()
-        dif = self.enemy.coordinates - self.coordinates
-        self._coordinates = self.coordinates + dif.normalize()
+        dif = self.enemy_coordinates - self.coordinates
+        self._coordinates = self.coordinates + dif.normalize() / 20
         if self.got_to_enemy:
             self.enemy.get_damage(self.damage)
