@@ -113,7 +113,7 @@ class Game:
 
     def arrows_turn(self):
         for arrow in self.arrows:
-            if arrow.got_to_enemy:
+            if arrow.got_to_enemy or not arrow.enemy.is_alive:
                 self.arrows.remove(arrow)
             else:
                 arrow.move()
