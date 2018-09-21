@@ -17,6 +17,8 @@ class GameWindow(QMainWindow):
     WIDTH = 1920
     HEIGHT = 1000
 
+    SHIFT = 1
+
     FONT = QFont("times", 20)
 
     def __init__(self, game):
@@ -47,7 +49,22 @@ class GameWindow(QMainWindow):
         self.__quit_button.move(self.WIDTH - 150, 10)
         self.__quit_button.clicked.connect(self.quit)
 
-        self.__tower_cell_buttons = []
+        self.__tower_cell_buttons = self.get_tower_cell_buttons()
+        self.__tower_cell_buttons_shown = False
+
+        self.__add_enemy_button = QPushButton('Add Enemy', self)
+        self.__add_enemy_button.move(250, 610)
+        self.__add_enemy_button.clicked.connect(self.add_enemy_to_queue)
+
+        self.enemies_health_bars = []
+
+        self.__timer.start(self.TIMER_INTERVAL, self)
+
+        self.pause()
+        self.show()
+
+    def get_tower_cell_buttons(self):
+        tower_cell_buttons = []
         for cell in self.game.game_map:
             if not cell.is_road:
                 button = QPushButton('', self)
@@ -57,17 +74,8 @@ class GameWindow(QMainWindow):
                 button.setStyleSheet("border-image: url(images/towerButton.png) stretch;");
                 button.clicked.connect(partial(self.build_tower, button))
                 button.hide()
-                self.__tower_cell_buttons.append(button)
-        self.__tower_cell_buttons_shown = False
-
-        self.__add_enemy_button = QPushButton('Add Enemy', self)
-        self.__add_enemy_button.move(250, 610)
-        self.__add_enemy_button.clicked.connect(self.add_enemy_to_queue)
-
-        self.__timer.start(self.TIMER_INTERVAL, self)
-
-        self.pause()
-        self.show()
+                tower_cell_buttons.append(button)
+        return tower_cell_buttons
 
     def add_enemy_to_queue(self):
         self.game.enemies_to_add += 1
