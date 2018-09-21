@@ -32,7 +32,7 @@ class Land(Unit):
 class Enemy(Unit):
 
     def __init__(self, max_health, route, damage, steps_for_cell):
-        super().__init__(route[0], QPixmap('images/soldier.png'))
+        super().__init__(route[0], QPixmap('images/soldier1.png'))
         self.__health = max_health
         self.__route = route
         self.__current_route_point = 0

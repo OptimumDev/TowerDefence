@@ -12,7 +12,7 @@ class GameWindow(QMainWindow):
     EXIT_CODE_REBOOT = -123
 
     IMAGE_SIZE = 64
-    HEALTH_BAR_SHIFT = 32
+    HEALTH_BAR_SHIFT = IMAGE_SIZE / 2
     TIMER_INTERVAL = 16
 
     WIDTH = 1920
@@ -30,7 +30,7 @@ class GameWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setGeometry(0, 30, self.WIDTH, self.HEIGHT)
+        self.setWindowState(Qt.WindowFullScreen)
         self.setWindowTitle('TD')
         self.setWindowIcon(QIcon('images/smorc.png'))
 
@@ -197,7 +197,7 @@ class GameWindow(QMainWindow):
         painter.drawPixmap(x, y, self.IMAGE_SIZE, self.IMAGE_SIZE, image)
 
     def draw_signature(self, painter):
-        painter.drawText(self.WIDTH - 125, self.HEIGHT - 10, 'Made by Artemiy Izakov')
+        painter.drawText(self.width() - 125, self.height() - 10, 'Made by Artemiy Izakov')
 
     def draw_gold(self, painter):
         painter.setFont(self.FONT)
