@@ -1,5 +1,5 @@
 from functools import partial
-from PyQt5.QtWidgets import QMainWindow, QFrame, QPushButton, QMessageBox, qApp
+from PyQt5.QtWidgets import QMainWindow, QFrame, QPushButton, QMessageBox, qApp, QProgressBar
 from PyQt5.QtCore import QBasicTimer
 from PyQt5.QtGui import QIcon, QPainter, QFont, QCursor, QPixmap
 from PyQt5.Qt import Qt
@@ -12,6 +12,7 @@ class GameWindow(QMainWindow):
     EXIT_CODE_REBOOT = -123
 
     IMAGE_SIZE = 64
+    HEALTH_BAR_SHIFT = 32
     TIMER_INTERVAL = 16
 
     WIDTH = 1920
@@ -56,12 +57,32 @@ class GameWindow(QMainWindow):
         self.__add_enemy_button.move(250, 610)
         self.__add_enemy_button.clicked.connect(self.add_enemy_to_queue)
 
-        self.enemies_health_bars = []
+        self.enemies_health_bars = {}
 
         self.__timer.start(self.TIMER_INTERVAL, self)
 
         self.pause()
         self.show()
+
+    def add_enemies_health_bars(self):
+        while len(self.game.new_enemies) > 0:
+            enemy = self.game.new_enemies.pop()
+            bar = QProgressBar(self)
+            bar.resize(self.IMAGE_SIZE, self.IMAGE_SIZE / 4)
+            bar.setAlignment(Qt.AlignCenter)
+            bar.setStyleSheet('QProgressBar::chunk {background-color: red;}')
+            bar.setMaximum(enemy.health)
+            self.enemies_health_bars[enemy] = bar
+            bar.show()
+
+    def update_enemies_health_bars(self):
+        for enemy, bar in self.enemies_health_bars.items():
+            if not enemy.is_alive:
+                bar.close()
+            else:
+                coordinates = enemy.coordinates.convert_to_image_coordinates(self.IMAGE_SIZE, self.SHIFT)
+                bar.move(coordinates.x, coordinates.y - self.HEALTH_BAR_SHIFT)
+                bar.setValue(enemy.health)
 
     def get_tower_cell_buttons(self):
         tower_cell_buttons = []
@@ -203,6 +224,8 @@ class GameWindow(QMainWindow):
     def timerEvent(self, event):
         if event.timerId() == self.__timer.timerId():
             self.game.update()
+            self.add_enemies_health_bars()
+            self.update_enemies_health_bars()
             if not self.game.castle.is_alive:
                 self.game_over()
             self.update()

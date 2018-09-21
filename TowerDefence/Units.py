@@ -110,6 +110,7 @@ class Arrow(Unit):
         self.initial_image = self.image
         self.enemy = enemy
         self.damage = damage
+        self.dealt_damage = False
         self.rotate()
 
     ENEMY_RADIUS = Point(0, 0)
@@ -132,5 +133,6 @@ class Arrow(Unit):
         self.rotate()
         dif = self.enemy_coordinates - self.coordinates
         self._coordinates = self.coordinates + dif.normalize() / 20
-        if self.got_to_enemy:
+        if not self.dealt_damage and self.got_to_enemy:
             self.enemy.get_damage(self.damage)
+            self.dealt_damage = True

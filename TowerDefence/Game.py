@@ -11,7 +11,7 @@ class Game:
     TOWER_COST = 30
 
     ENEMY_ADD_INTERVAL = 85
-    ENEMY_HEALTH = 30
+    ENEMY_HEALTH = 25
     ENEMY_DAMAGE = 5
     ENEMY_GOLD = 10
 
@@ -39,6 +39,7 @@ class Game:
         self.enemies = []
         self.enemies_to_add = 1
         self.__enemies_add_ticks = 0
+        self.new_enemies = []
 
     def get_map_size(self, map_file):
         with open(map_file) as game_map:
@@ -91,7 +92,9 @@ class Game:
         return self.__tick_number % self.ENEMY_TURN_INTERVAL == 0
 
     def add_enemy(self):
-        self.enemies.append(Enemy(self.ENEMY_HEALTH, self.__enemies_route, self.ENEMY_DAMAGE, self.TOWER_TURN_INTERVAL))
+        enemy = Enemy(self.ENEMY_HEALTH, self.__enemies_route, self.ENEMY_DAMAGE, self.TOWER_TURN_INTERVAL)
+        self.enemies.append(enemy)
+        self.new_enemies.append(enemy)
         self.enemies_to_add -= 1
 
     @property
@@ -113,7 +116,7 @@ class Game:
 
     def arrows_turn(self):
         for arrow in self.arrows:
-            if arrow.got_to_enemy or not arrow.enemy.is_alive:
+            if arrow.dealt_damage or not arrow.enemy.is_alive:
                 self.arrows.remove(arrow)
             else:
                 arrow.move()
