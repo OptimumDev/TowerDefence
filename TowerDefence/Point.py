@@ -3,9 +3,14 @@ from math import sqrt
 
 class Point:
 
+    EPSILON = 0.0001
+
     def __init__(self, x, y):
         self.__x = x
         self.__y = y
+
+    def __abs__(self):
+        return Point(abs(self.x), abs(self.y))
 
     def __copy__(self):
         return Point(self.x, self.y)
@@ -14,7 +19,7 @@ class Point:
         return 'Point({}, {})'.format(self.x, self.y)
 
     def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
+        return abs(self.x - other.x) < self.EPSILON and abs(self.y - other.y) < self.EPSILON
 
     def __sub__(self, other):
         return Point(self.x - other.x, self.y - other.y)
@@ -31,7 +36,7 @@ class Point:
         return self
 
     def __lt__(self, other):
-        if self.x == other.x:
+        if abs(self.x - other.x) < self.EPSILON:
             return self.y < other.y
         return self.x < other.x
 

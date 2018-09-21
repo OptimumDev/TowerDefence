@@ -36,7 +36,7 @@ class Game:
         self.gold = 60
 
         self.enemies = []
-        self.enemies_to_add = 3
+        self.enemies_to_add = 1
         self.__enemies_add_ticks = 0
 
     def get_map_size(self, map_file):
@@ -86,7 +86,7 @@ class Game:
         return self.__tick_number % self.UNITS_TURN_INTERVAL == 0
 
     def add_enemy(self):
-        self.enemies.append(Enemy(self.ENEMY_HEALTH, self.__enemies_route, self.ENEMY_DAMAGE))
+        self.enemies.append(Enemy(self.ENEMY_HEALTH, self.__enemies_route, self.ENEMY_DAMAGE, self.UNITS_TURN_INTERVAL))
         self.enemies_to_add -= 1
 
     @property
@@ -125,8 +125,8 @@ class Game:
                     break
 
     def units_turn(self):
+        self.enemies_turn()
         if self.is_units_turn:
-            self.enemies_turn()
             self.towers_turn()
 
     def add_enemies(self):

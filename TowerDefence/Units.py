@@ -1,4 +1,5 @@
 from PyQt5.QtGui import QPixmap, QTransform
+from Point import Point
 import math
 
 
@@ -30,14 +31,13 @@ class Land(Unit):
 
 class Enemy(Unit):
 
-    def __init__(self, max_health, route, damage):
+    def __init__(self, max_health, route, damage, steps_for_cell):
         super().__init__(route[0], QPixmap('images/soldier.png'))
         self.__health = max_health
         self.__route = route
         self.__current_route_point = 0
         self.__damage = damage
-        # self.__step_count = 0
-        # self.__steps_for_cell = steps_for_cell
+        self.steps_for_cell = steps_for_cell
 
     @property
     def health(self):
@@ -58,16 +58,17 @@ class Enemy(Unit):
     def get_damage(self, damage):
         self.__health -= damage
 
+    EPSILON = Point(0.0001, 0.0001)
+
     def move(self):
-        # distance = 0
         if not self.got_to_route_end:
-            # if self.__step_count == 0:
-            self.__current_route_point += 1
-            #    distance = self.__route[self.__current_route_point] - self._coordinates
-            # a = distance / self.__steps_for_cell
-            # self._coordinates += a
-            # self.__step_count = (self.__step_count + 1) % self.__steps_for_cell
-            self._coordinates = self.__route[self.__current_route_point]
+            direction = self.__route[self.__current_route_point + 1] - self.__route[self.__current_route_point]
+            step = direction / self.steps_for_cell
+            self._coordinates = self.coordinates + step
+            print(self.__route[self.__current_route_point + 1], "-", self.__route[self.__current_route_point], "=", direction, self.__current_route_point)
+            if abs(self.coordinates - self.__route[self.__current_route_point + 1]) < self.EPSILON:
+                print(abs(self.coordinates - self.__route[self.__current_route_point + 1]), 'next')
+                self.__current_route_point += 1
 
 
 class Tower(Unit):
