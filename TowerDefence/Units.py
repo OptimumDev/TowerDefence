@@ -1,4 +1,5 @@
 from PyQt5.QtGui import QPixmap, QTransform
+from Directions import Directions
 from Point import Point
 import math
 
@@ -31,13 +32,33 @@ class Land(Unit):
 
 class Enemy(Unit):
 
+    STEPS = 5
+
     def __init__(self, max_health, route, damage, steps_for_cell):
         super().__init__(route[0], QPixmap('images/soldier1.png'))
+        self.images = self.get_image_dictionary()
+        self.current_direction = Directions.Right
+        self.current_image = 0
         self.__health = max_health
         self.__route = route
         self.__current_route_point = 0
         self.__damage = damage
         self.steps_for_cell = steps_for_cell
+
+    def get_image_dictionary(self):
+        image_dictionary = {}
+        for direction in [Directions.Right, Directions.Left, Directions.Up, Directions.Down]:
+            image_dictionary[direction] = [QPixmap(f'images/orcs/{direction}/1.png'),
+                                           QPixmap(f'images/orcs/{direction}/2.png'),
+                                           QPixmap(f'images/orcs/{direction}/3.png'),
+                                           QPixmap(f'images/orcs/{direction}/4.png'),
+                                           QPixmap(f'images/orcs/{direction}/5.png')]
+        return image_dictionary
+
+    @property
+    def image(self):
+        self.current_image = (self.current_image + 0.1) % self.STEPS
+        return self.images[self.current_direction][int(self.current_image)]
 
     @property
     def health(self):
@@ -61,6 +82,7 @@ class Enemy(Unit):
     def move(self):
         if not self.got_to_route_end:
             direction = self.__route[self.__current_route_point + 1] - self.__route[self.__current_route_point]
+            self.current_direction = direction.convert_to_direction()
             step = direction / self.steps_for_cell
             self._coordinates = self.coordinates + step
             if self.coordinates == self.__route[self.__current_route_point + 1]:

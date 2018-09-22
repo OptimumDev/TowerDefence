@@ -1,4 +1,5 @@
 from math import sqrt
+from Directions import Directions
 
 
 class Point:
@@ -42,6 +43,15 @@ class Point:
         if abs(self.x - other.x) < self.EPSILON:
             return self.y < other.y
         return self.x < other.x
+
+    def convert_to_direction(self):
+        if abs(self.x) < self.EPSILON:
+            if abs(self.y - 1) < self.EPSILON:
+                return Directions.Down
+            return Directions.Up
+        if abs(self.x + 1) < self.EPSILON:
+            return Directions.Left
+        return Directions.Right
 
     def convert_to_image_coordinates(self, image_size, shift):
         return Point((self.x) * image_size, (self.y + shift) * image_size)
