@@ -4,7 +4,7 @@ from PyQt5.QtCore import QBasicTimer
 from PyQt5.QtGui import QIcon, QPainter, QFont, QCursor, QPixmap
 from PyQt5.Qt import Qt
 from Point import Point
-from Game import Game
+from Units.Towers import ArrowTower
 
 
 class GameWindow(QMainWindow):
@@ -38,7 +38,7 @@ class GameWindow(QMainWindow):
         self.__pause_button.move(50, 610)
         self.__pause_button.clicked.connect(self.pause_click)
 
-        self.__tower_button = QPushButton(f'Build Tower ({Game.TOWER_COST}G)', self)
+        self.__tower_button = QPushButton(f'Build Tower ({ArrowTower.COST}G)', self)
         self.__tower_button.move(150, 610)
         self.__tower_button.clicked.connect(self.show_tower_cell_btns)
 
@@ -118,7 +118,7 @@ class GameWindow(QMainWindow):
     def create_tower_cursor(self):
         painter = QPainter()
         tower = QPixmap('images/tower.png')
-        size = 2 * (Game.TOWER_RANGE - 1) * self.IMAGE_SIZE
+        size = 2 * (ArrowTower.SHOOTING_RANGE - 1) * self.IMAGE_SIZE
         circle = QPixmap(size, size)
         circle.fill(Qt.transparent)
         painter.begin(circle)
@@ -193,8 +193,8 @@ class GameWindow(QMainWindow):
         painter.setFont(self.FONT)
         painter.drawText(650, 35, f'Gold: {self.game.gold}')
 
-    def draw_arrows(self, painter):
-        for arrow in self.game.arrows:
+    def draw_Projectiles(self, painter):
+        for arrow in self.game.projectiles:
             self.draw_in_cell(arrow.image, arrow.coordinates, painter)
 
     def paintEvent(self, event):
@@ -207,7 +207,7 @@ class GameWindow(QMainWindow):
         self.draw_towers(painter)
         self.draw_enemies(painter)
         self.draw_castle(painter)
-        self.draw_arrows(painter)
+        self.draw_Projectiles(painter)
 
         painter.end()
 

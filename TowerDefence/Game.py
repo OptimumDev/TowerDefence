@@ -1,4 +1,7 @@
-from Units import Land, Castle, Enemy, Arrow, Tower
+from Units.Land import Land
+from Units.Castle import Castle
+from Units.Enemies import Orc
+from Units.Towers import ArrowTower
 from Point import Point
 
 
@@ -6,15 +9,10 @@ class Game:
 
     CASTLE_HEALTH = 100
 
-    TOWER_DAMAGE = 5
-    TOWER_RANGE = 5
-    TOWER_COST = 30
-
     ENEMY_HEALTH = 25
     ENEMY_DAMAGE = 5
     ENEMY_GOLD = 10
 
-    TOWER_TURN_INTERVAL = 40
     ENEMY_TURN_INTERVAL = 2
 
     def __init__(self, map_file):
@@ -31,7 +29,7 @@ class Game:
         self.__enemies_route = self.get_enemies_route()
 
 
-        self.arrows = []
+        self.projectiles = []
 
         self.towers = []
         self.gold = 60
@@ -84,25 +82,21 @@ class Game:
         return Castle(coordinates, self.CASTLE_HEALTH)
 
     @property
-    def is_towers_turn(self):
-        return self.__tick_number % self.TOWER_TURN_INTERVAL == 0
-
-    @property
     def is_enemys_turn(self):
         return self.__tick_number % self.ENEMY_TURN_INTERVAL == 0
 
     def add_enemy(self):
-        enemy = Enemy(self.ENEMY_HEALTH, self.__enemies_route, self.ENEMY_DAMAGE, self.TOWER_TURN_INTERVAL)
+        enemy = Orc(self.__enemies_route)
         self.enemies.append(enemy)
         self.new_enemies.append(enemy)
 
     @property
     def able_to_build_tower(self):
-        return self.gold >= self.TOWER_COST
+        return self.gold >= ArrowTower.COST
 
     def build_tower(self, coordinates):
-        self.towers.append(Tower(coordinates, self.TOWER_DAMAGE, self.TOWER_RANGE))
-        self.gold -= self.TOWER_COST
+        self.towers.append(ArrowTower(coordinates))
+        self.gold -= ArrowTower.COST
 
     def check_enemies(self):
         for enemy in self.enemies:
@@ -114,9 +108,9 @@ class Game:
                 self.enemies.remove(enemy)
 
     def arrows_turn(self):
-        for arrow in self.arrows:
+        for arrow in self.projectiles:
             if arrow.dealt_damage or not arrow.enemy.is_alive:
-                self.arrows.remove(arrow)
+                self.projectiles.remove(arrow)
             else:
                 arrow.move()
 
@@ -126,18 +120,19 @@ class Game:
 
     def towers_turn(self):
         for tower in self.towers:
-            for enemy in self.enemies:
-                if tower.try_to_shoot(enemy):
-                    self.arrows.append(Arrow(tower.coordinates, enemy, self.TOWER_DAMAGE))
-                    break
+            tower.update()
+            if tower.time_to_shoot:
+                for enemy in self.enemies:
+                    if tower.try_to_shoot(enemy):
+                        self.projectiles.append(tower.get_projectile(enemy))
+                        break
 
     def units_turn(self):
         if self.enemy_add_interval > 15 and self.__tick_number % 2000 == 0:
             self.enemy_add_interval //= 2
         if self.is_enemys_turn:
             self.enemies_turn()
-        if self.is_towers_turn:
-            self.towers_turn()
+        self.towers_turn()
 
     def add_enemies(self):
         if self.__enemies_add_ticks == 0:
