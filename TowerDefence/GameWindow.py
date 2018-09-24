@@ -41,7 +41,7 @@ class GameWindow(QMainWindow):
 
         self.__tower_button = QPushButton('', self)
         self.__tower_button.setStyleSheet("background: transparent;");
-        self.__tower_button.setGeometry(10, self.height() - 10 - self.IMAGE_SIZE * 5 / 2,
+        self.__tower_button.setGeometry(10, self.height() - self.IMAGE_SIZE * 3,
                                         self.IMAGE_SIZE * 2, self.IMAGE_SIZE * 2)
         self.__tower_button.clicked.connect(self.show_tower_cell_btns)
 
@@ -211,14 +211,14 @@ class GameWindow(QMainWindow):
             self.draw_in_cell(arrow.image, arrow.coordinates, painter)
 
     def draw_tower_costs(self, painter):
-        painter.drawPixmap(self.__tower_button.x(), self.__tower_button.y(), self.IMAGE_SIZE * 2, self.IMAGE_SIZE * 2,
+        painter.drawPixmap(self.__tower_button.x(), self.__tower_button.y(), self.IMAGE_SIZE * 2, self.IMAGE_SIZE * 3,
                            QPixmap('images/button.png'))
         painter.drawPixmap(self.__tower_button.x() + 10, self.__tower_button.y() + 10,
                            self.IMAGE_SIZE * 2 - 20, self.IMAGE_SIZE * 2 - 20, QPixmap('images/tower.png'))
-        arrow_x = self.__tower_button.x() + self.__tower_button.width() // 2 - self.IMAGE_SIZE // 2
-        arrow_y = self.__tower_button.y() + self.__tower_button.height() + 5
-        painter.drawPixmap(arrow_x - 5, arrow_y, self.IMAGE_SIZE // 2, self.IMAGE_SIZE // 2, self.coin_picture)
-        painter.drawText(arrow_x + 30, arrow_y + self.IMAGE_SIZE // 2 - 5, f'{ArrowTower.COST}')
+        arrow_x = self.__tower_button.x() + self.__tower_button.width() - self.IMAGE_SIZE // 2
+        arrow_y = self.__tower_button.y() + self.__tower_button.height() + 16
+        painter.drawPixmap(arrow_x - 10, arrow_y, self.IMAGE_SIZE // 2, self.IMAGE_SIZE // 2, self.coin_picture)
+        painter.drawText(arrow_x - self.IMAGE_SIZE // 2 - 15, arrow_y + self.IMAGE_SIZE // 2 - 6, f'{ArrowTower.COST}')
 
     def paintEvent(self, event):
         painter = QPainter()
