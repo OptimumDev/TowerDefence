@@ -53,10 +53,6 @@ class GameWindow(QMainWindow):
         self.__tower_cell_buttons = self.get_tower_cell_buttons()
         self.__tower_cell_buttons_shown = False
 
-        self.__add_enemy_button = QPushButton('Add Enemy', self)
-        self.__add_enemy_button.move(250, 610)
-        self.__add_enemy_button.clicked.connect(self.add_enemy_to_queue)
-
         self.enemies_health_bars = {}
 
         self.__timer.start(self.TIMER_INTERVAL, self)
@@ -77,7 +73,7 @@ class GameWindow(QMainWindow):
 
     def update_enemies_health_bars(self):
         for enemy, bar in self.enemies_health_bars.items():
-            if not enemy.is_alive:
+            if not enemy.is_alive or enemy.got_to_route_end:
                 bar.close()
             else:
                 coordinates = enemy.coordinates.convert_to_image_coordinates(self.IMAGE_SIZE, self.SHIFT)
@@ -97,10 +93,6 @@ class GameWindow(QMainWindow):
                 button.hide()
                 tower_cell_buttons.append(button)
         return tower_cell_buttons
-
-    def add_enemy_to_queue(self):
-        self.game.enemies_to_add += 1
-        self.update()
 
     def game_over(self):
         self.pause()
@@ -174,8 +166,6 @@ class GameWindow(QMainWindow):
             self.draw_in_cell(land.image, land.coordinates, painter)
 
     def draw_enemies(self, painter):
-        painter.setFont(self.FONT)
-        painter.drawText(50, 35, f'Enemies left: {self.game.enemies_to_add}')
         for enemy in self.game.enemies:
             self.draw_in_cell(enemy.image, enemy.coordinates, painter, 0, self.IMAGE_SIZE // 4)
 

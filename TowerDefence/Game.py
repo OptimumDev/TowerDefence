@@ -10,7 +10,6 @@ class Game:
     TOWER_RANGE = 5
     TOWER_COST = 30
 
-    ENEMY_ADD_INTERVAL = 85
     ENEMY_HEALTH = 25
     ENEMY_DAMAGE = 5
     ENEMY_GOLD = 10
@@ -31,13 +30,14 @@ class Game:
         self.__map_height = map_size[1]
         self.__enemies_route = self.get_enemies_route()
 
+
         self.arrows = []
 
         self.towers = []
         self.gold = 60
 
         self.enemies = []
-        self.enemies_to_add = 1
+        self.enemy_add_interval = 200
         self.__enemies_add_ticks = 0
         self.new_enemies = []
 
@@ -95,7 +95,6 @@ class Game:
         enemy = Enemy(self.ENEMY_HEALTH, self.__enemies_route, self.ENEMY_DAMAGE, self.TOWER_TURN_INTERVAL)
         self.enemies.append(enemy)
         self.new_enemies.append(enemy)
-        self.enemies_to_add -= 1
 
     @property
     def able_to_build_tower(self):
@@ -133,18 +132,19 @@ class Game:
                     break
 
     def units_turn(self):
+        if self.enemy_add_interval > 15 and self.__tick_number % 2000 == 0:
+            self.enemy_add_interval //= 2
         if self.is_enemys_turn:
             self.enemies_turn()
         if self.is_towers_turn:
             self.towers_turn()
 
     def add_enemies(self):
-        if self.enemies_to_add > 0:
-            if self.__enemies_add_ticks == 0:
-                self.add_enemy()
-                self.__enemies_add_ticks = self.ENEMY_ADD_INTERVAL
-            else:
-                self.__enemies_add_ticks -= 1
+        if self.__enemies_add_ticks == 0:
+            self.add_enemy()
+            self.__enemies_add_ticks = self.enemy_add_interval
+        else:
+            self.__enemies_add_ticks -= 1
 
     def update(self):
         self.__tick_number += 1
