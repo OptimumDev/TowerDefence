@@ -56,6 +56,15 @@ class GameWindow(QMainWindow):
         self.__tower_cell_buttons = self.get_tower_cell_buttons()
         self.__tower_cell_buttons_shown = False
 
+        self.castle_bar = QProgressBar(self)
+        self.castle_bar.setAlignment(Qt.AlignCenter)
+        castle_coordinates = self.game.castle.coordinates.convert_to_image_coordinates(self.IMAGE_SIZE, self.SHIFT)
+        self.castle_bar.setGeometry(castle_coordinates.x + 5, castle_coordinates.y - self.IMAGE_SIZE // 2 - 10,
+                                    self.IMAGE_SIZE * 3 - 10, self.IMAGE_SIZE // 2)
+        self.castle_bar.setMaximum(self.game.castle.health)
+        self.castle_bar.setStyleSheet('QProgressBar{padding: 1px;} QProgressBar::chunk {background-color: #0090ff;}')
+        self.castle_bar.setValue(self.game.castle.health)
+
         self.enemies_health_bars = {}
 
         self.__timer.start(self.TIMER_INTERVAL, self)
@@ -69,12 +78,13 @@ class GameWindow(QMainWindow):
             bar = QProgressBar(self)
             bar.resize(self.IMAGE_SIZE, self.IMAGE_SIZE / 4)
             bar.setAlignment(Qt.AlignCenter)
-            bar.setStyleSheet('QProgressBar::chunk {background-color: red;}')
+            bar.setStyleSheet('QProgressBar{padding: 1px;} QProgressBar::chunk {background-color: red;}')
             bar.setMaximum(enemy.health)
             self.enemies_health_bars[enemy] = bar
             bar.show()
 
-    def update_enemies_health_bars(self):
+    def update_health_bars(self):
+        self.castle_bar.setValue(self.game.castle.health)
         for enemy, bar in self.enemies_health_bars.items():
             if not enemy.is_alive or enemy.got_to_route_end:
                 bar.close()
@@ -177,8 +187,6 @@ class GameWindow(QMainWindow):
             self.draw_in_cell(tower.image, tower.coordinates, painter)
 
     def draw_castle(self, painter):
-        painter.setFont(self.FONT)
-        painter.drawText(self.width() - 230, self.IMAGE_SIZE * 2 - 10, f'Castle health: {self.game.castle.health}')
         image = self.game.castle.image
         coordinates = self.game.castle.coordinates.convert_to_image_coordinates(self.IMAGE_SIZE, self.SHIFT)
         painter.drawPixmap(coordinates.x, coordinates.y, self.IMAGE_SIZE * 3, self.IMAGE_SIZE * 3, image)
@@ -231,7 +239,7 @@ class GameWindow(QMainWindow):
         if event.timerId() == self.__timer.timerId():
             self.game.update()
             self.add_enemies_health_bars()
-            self.update_enemies_health_bars()
+            self.update_health_bars()
             if not self.game.castle.is_alive:
                 self.game_over()
             self.update()

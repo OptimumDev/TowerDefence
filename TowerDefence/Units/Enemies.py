@@ -30,7 +30,7 @@ class Enemy(Unit):
 
     @property
     def image(self):
-        self.current_image = (self.current_image + 2 / self.steps_for_cell) % self.STEPS
+        self.current_image = (self.current_image + 4 / self.steps_for_cell) % self.STEPS
         return self.images[self.current_direction][int(self.current_image)]
 
     @property
