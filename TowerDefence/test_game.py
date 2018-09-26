@@ -1,5 +1,7 @@
 from Point import Point
 from Game import Game
+import sys
+from PyQt5.QtWidgets import QApplication
 
 
 def test_get_map_size():
@@ -8,10 +10,12 @@ def test_get_map_size():
     assert expected == actual
 
 
-game = Game('map.txt')
+app = QApplication(sys.argv)
+game = Game("map.txt")
 
 
 def test_enemies_turn():
+    game = Game("map.txt")
     assert game.is_enemies_turn
 
 
