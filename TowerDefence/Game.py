@@ -19,7 +19,7 @@ class Game:
         self.__start = Point(0, 0)
         self.__finish = Point(0, 0)
 
-        self.__tick_number = 0
+        self.tick_number = 0
 
         map_size = self.get_map_size(map_file)
         self.game_map = self.get_map(map_file)
@@ -27,7 +27,6 @@ class Game:
         self.__map_width = map_size[0]
         self.__map_height = map_size[1]
         self.__enemies_route = self.get_enemies_route()
-
 
         self.projectiles = []
 
@@ -39,12 +38,13 @@ class Game:
         self.__enemies_add_ticks = 0
         self.new_enemies = []
 
-    def get_map_size(self, map_file):
+    @staticmethod
+    def get_map_size(map_file):
         with open(map_file) as game_map:
             lines = game_map.readlines()
             map_width = len(lines[0]) - 1
             map_height = len(lines)
-            return (map_width, map_height)
+            return map_width, map_height
 
     def get_map(self, map_file):
         result = []
@@ -82,8 +82,8 @@ class Game:
         return Castle(coordinates, self.CASTLE_HEALTH)
 
     @property
-    def is_enemys_turn(self):
-        return self.__tick_number % self.ENEMY_TURN_INTERVAL == 0
+    def is_enemies_turn(self):
+        return self.tick_number % self.ENEMY_TURN_INTERVAL == 0
 
     def add_enemy(self):
         enemy = Orc(self.__enemies_route)
@@ -128,9 +128,9 @@ class Game:
                         break
 
     def units_turn(self):
-        if self.enemy_add_interval > 15 and self.__tick_number % 2000 == 0:
+        if self.enemy_add_interval > 15 and self.tick_number % 2000 == 0:
             self.enemy_add_interval //= 2
-        if self.is_enemys_turn:
+        if self.is_enemies_turn:
             self.enemies_turn()
         self.towers_turn()
 
@@ -142,7 +142,7 @@ class Game:
             self.__enemies_add_ticks -= 1
 
     def update(self):
-        self.__tick_number += 1
+        self.tick_number += 1
         self.check_enemies()
         self.arrows_turn()
         self.units_turn()
