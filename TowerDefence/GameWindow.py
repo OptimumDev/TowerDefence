@@ -5,6 +5,7 @@ from PyQt5.QtGui import QIcon, QPainter, QFont, QCursor, QPixmap
 from PyQt5.Qt import Qt
 from Point import Point
 from Units.Towers import ArrowTower
+from Units.Projectiles import Arrow
 
 
 class GameWindow(QMainWindow):
@@ -34,6 +35,9 @@ class GameWindow(QMainWindow):
         self.setWindowState(Qt.WindowFullScreen)
         self.setWindowTitle('TD')
         self.setWindowIcon(QIcon('images/smorc.png'))
+        self.setStyleSheet("QToolTip{background-color: black; font-size: 16px; color: white; "
+                           "border: black solid 1px}")
+        # self.setStyleSheet("QToolTip{font-size: 16px; color: black;}")
 
         self.__pause_button = QPushButton('Pause/Play', self)
         self.__pause_button.move(self.WIDTH - 350, 10)
@@ -43,6 +47,9 @@ class GameWindow(QMainWindow):
         self.__tower_button.setStyleSheet("background: transparent;");
         self.__tower_button.setGeometry(10, self.height() - self.IMAGE_SIZE * 3,
                                         self.IMAGE_SIZE * 2, self.IMAGE_SIZE * 2)
+        self.__tower_button.setToolTip(f'{ArrowTower.NAME}\nDamage: {Arrow.DAMAGE}\nRange: {ArrowTower.SHOOTING_RANGE}'
+                                       f'\nSpeed: {self.get_shooting_speed(ArrowTower.SHOOTING_RATE)} shots/min'
+                                       f'            .\n\n')
         self.__tower_button.clicked.connect(self.show_tower_cell_btns)
 
         self.__restart_button = QPushButton('Restart', self)
@@ -71,6 +78,9 @@ class GameWindow(QMainWindow):
 
         self.pause()
         self.show()
+
+    def get_shooting_speed(self, shooting_rate):
+        return shooting_rate * 60 * self.TIMER_INTERVAL // 1000
 
     def add_enemies_health_bars(self):
         while len(self.game.new_enemies) > 0:

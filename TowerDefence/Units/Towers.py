@@ -33,6 +33,7 @@ class ArrowTower(Tower):
     SHOOTING_RANGE = 5
     SHOOTING_RATE = 40
     COST = 30
+    NAME = 'Arrow Tower'
 
     def __init__(self, coordinates):
         super().__init__(coordinates, self.SHOOTING_RANGE, self.SHOOTING_RATE, self.COST, QPixmap('images/tower.png'))
