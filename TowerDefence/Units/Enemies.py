@@ -7,8 +7,9 @@ class Enemy(Unit):
 
     STEPS = 5
 
-    def __init__(self, max_health, route, damage, steps_for_cell):
+    def __init__(self, max_health, route, damage, steps_for_cell, images_directory):
         super().__init__(route[0], QPixmap('images/soldier1.png'))
+        self.images_directory = images_directory
         self.images = self.get_image_dictionary()
         self.current_direction = Directions.Right
         self.current_image = 0
@@ -21,11 +22,11 @@ class Enemy(Unit):
     def get_image_dictionary(self):
         image_dictionary = {}
         for direction in [Directions.Right, Directions.Left, Directions.Up, Directions.Down]:
-            image_dictionary[direction] = [QPixmap(f'images/orcs/{direction}/1.png'),
-                                           QPixmap(f'images/orcs/{direction}/2.png'),
-                                           QPixmap(f'images/orcs/{direction}/3.png'),
-                                           QPixmap(f'images/orcs/{direction}/4.png'),
-                                           QPixmap(f'images/orcs/{direction}/5.png')]
+            image_dictionary[direction] = [QPixmap(f'images/{self.images_directory}/{direction}/1.png'),
+                                           QPixmap(f'images/{self.images_directory}/{direction}/2.png'),
+                                           QPixmap(f'images/{self.images_directory}/{direction}/3.png'),
+                                           QPixmap(f'images/{self.images_directory}/{direction}/4.png'),
+                                           QPixmap(f'images/{self.images_directory}/{direction}/5.png')]
         return image_dictionary
 
     @property
@@ -67,6 +68,7 @@ class Orc(Enemy):
     MAX_HEALTH = 25
     DAMAGE = 5
     STEPS_FOR_CELL = 40
+    IMAGES_DIRECTORY = "orcs"
 
     def __init__(self, route):
-        super().__init__(self.MAX_HEALTH, route, self.DAMAGE, self.STEPS_FOR_CELL)
+        super().__init__(self.MAX_HEALTH, route, self.DAMAGE, self.STEPS_FOR_CELL, self.IMAGES_DIRECTORY)
