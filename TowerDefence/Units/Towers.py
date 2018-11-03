@@ -34,9 +34,11 @@ class ArrowTower(Tower):
     SHOOTING_RATE = 40
     COST = 30
     NAME = 'Arrow Tower'
+    IMAGE_NAME = 'images/archerTower.png'
 
     def __init__(self, coordinates):
-        super().__init__(coordinates, self.SHOOTING_RANGE, self.SHOOTING_RATE, self.COST, QPixmap('images/tower.png'))
+        super().__init__(coordinates, self.SHOOTING_RANGE, self.SHOOTING_RATE, self.COST,
+                         QPixmap(self.IMAGE_NAME))
 
     def get_projectile(self, target):
         return Arrow(self.coordinates, target)

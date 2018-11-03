@@ -140,7 +140,7 @@ class GameWindow(QMainWindow):
 
     def create_tower_cursor(self):
         painter = QPainter()
-        tower = QPixmap('images/tower.png')
+        tower = QPixmap(ArrowTower.IMAGE_NAME)
         size = 2 * (ArrowTower.SHOOTING_RANGE - 1) * self.IMAGE_SIZE
         circle = QPixmap(size, size)
         circle.fill(Qt.transparent)
@@ -201,11 +201,11 @@ class GameWindow(QMainWindow):
         coordinates = self.game.castle.coordinates.convert_to_image_coordinates(self.IMAGE_SIZE, self.SHIFT)
         painter.drawPixmap(coordinates.x, coordinates.y, self.IMAGE_SIZE * 3, self.IMAGE_SIZE * 3, image)
 
-    def draw_in_cell(self, image, cell_coordinates, painter, x_shift=0, y_shift=0):
+    def draw_in_cell(self, image, cell_coordinates, painter, x_shift=0, y_shift=0, size=IMAGE_SIZE):
         image_coordinates = cell_coordinates.convert_to_image_coordinates(self.IMAGE_SIZE, self.SHIFT)
         x = image_coordinates.x + x_shift
         y = image_coordinates.y - y_shift
-        painter.drawPixmap(x, y, self.IMAGE_SIZE, self.IMAGE_SIZE, image)
+        painter.drawPixmap(x, y, size, size, image)
 
     def draw_signature(self, painter):
         painter.drawText(self.width() - 125, self.height() - 10, 'Made by Artemiy Izakov')
@@ -218,13 +218,14 @@ class GameWindow(QMainWindow):
 
     def draw_projectiles(self, painter):
         for arrow in self.game.projectiles:
-            self.draw_in_cell(arrow.image, arrow.coordinates, painter)
+            self.draw_in_cell(arrow.image, arrow.coordinates, painter,
+                              self.IMAGE_SIZE //4, -self.IMAGE_SIZE // 6, self.IMAGE_SIZE // 2)
 
     def draw_tower_costs(self, painter):
         painter.drawPixmap(self.__tower_button.x(), self.__tower_button.y(), self.IMAGE_SIZE * 2, self.IMAGE_SIZE * 3,
                            QPixmap('images/button.png'))
         painter.drawPixmap(self.__tower_button.x() + 10, self.__tower_button.y() + 10,
-                           self.IMAGE_SIZE * 2 - 20, self.IMAGE_SIZE * 2 - 20, QPixmap('images/tower.png'))
+                           self.IMAGE_SIZE * 2 - 20, self.IMAGE_SIZE * 2 - 20, QPixmap(ArrowTower.IMAGE_NAME))
         arrow_x = self.__tower_button.x() + self.__tower_button.width() - self.IMAGE_SIZE // 2
         arrow_y = self.__tower_button.y() + self.__tower_button.height() + 16
         painter.drawPixmap(arrow_x - 10, arrow_y, self.IMAGE_SIZE // 2, self.IMAGE_SIZE // 2, self.coin_picture)
